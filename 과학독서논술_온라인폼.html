@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과학독서논술 활동지 온라인 제출</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: '맑은 고딕', 'Malgun Gothic', sans-serif;
+    font-size: 10pt;
+    color: #111;
+    background: #f0f4f8;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  }
+
+  /* ── 헤더 ── */
+  .sheet-header {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid #1565C0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .header-title-block {
+    background: #1565C0;
+    color: #fff;
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 150px;
+  }
+  .header-title-block .sub { font-size: 8pt; opacity: .85; margin-bottom: 2px; }
+  .header-title-block .main { font-size: 15pt; font-weight: 700; letter-spacing: -0.3px; line-height: 1.3; }
+  
+  .header-info {
+    flex: 1;
+    padding: 10px 15px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    align-items: center;
+  }
+  .info-cell { display: flex; align-items: center; gap: 8px; font-size: 9pt; }
+  .info-label { color: #555; font-size: 9pt; white-space: nowrap; font-weight: bold; }
+  
+  input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #90CAF9;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 10pt;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+    border-color: #1565C0;
+    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.2);
+  }
+  .info-cell input { width: 100%; min-width: 50px; }
+
+  .header-note {
+    grid-column: 1 / -1;
+    font-size: 8.5pt;
+    color: #d32f2f;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid #E3F2FD;
+    font-weight: bold;
+  }
+
+  /* ── 섹션 공통 ── */
+  .section { margin-bottom: 25px; }
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 6px 12px;
+    background: #E3F2FD;
+    border-radius: 4px;
+    border-left: 4px solid #1565C0;
+  }
+  .crit-num {
+    background: #1565C0;
+    color: #fff;
+    font-weight: 700;
+    font-size: 8.5pt;
+    padding: 2px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .crit-num.g { background: #2E7D32; }
+  .crit-num.o { background: #E65100; }
+  .crit-num.p { background: #6A1B9A; }
+  .sec-title { font-weight: 700; font-size: 11pt; color: #1A237E; flex: 1; }
+  .sec-hint { font-size: 8.5pt; color: #555; }
+
+  /* ── 작성칸 ── */
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+    background: #fff;
+    line-height: 1.5;
+  }
+  textarea.lined {
+    background-image: repeating-linear-gradient(to bottom, transparent 0px, transparent 24px, #E3F2FD 24px, #E3F2FD 25px);
+    line-height: 25px;
+    padding-top: 5px;
+  }
+  .lg { min-height: 150px; }
+  .md { min-height: 100px; }
+
+  /* ── 도서 정보 ── */
+  .book-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 60px 1fr 100px 1fr;
+    gap: 10px;
+    align-items: center;
+    border: 1.5px solid #90CAF9;
+    border-radius: 5px;
+    padding: 15px;
+    background: #F8FBFF;
+  }
+  .bl { color: #1565C0; font-weight: 700; white-space: nowrap; text-align: right;}
+  
+  @media (max-width: 600px) {
+    .book-row {
+      grid-template-columns: 80px 1fr;
+    }
+    .bl { text-align: left; }
+    .header-info { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── 표 ── */
+  .mini-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+  .mini-table th {
+    background: #1565C0; color: #fff; font-weight: 700;
+    padding: 8px; border: 1px solid #90CAF9; text-align: center;
+  }
+  .mini-table td { border: 1px solid #BBDEFB; padding: 8px; vertical-align: top; }
+  .mini-table td.label-cell { width: 25%; }
+  .mini-table td.content-cell { width: 75%; }
+
+  /* ── 심화 주제 ── */
+  .topic-box {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    border: 1.5px solid #A5D6A7;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .topic-label {
+    background: #2E7D32;
+    color: #fff;
+    font-weight: 700;
+    font-size: 9.5pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    text-align: center;
+  }
+  .topic-content { padding: 15px; background: #E8F5E9; display: flex; flex-direction: column; gap: 10px; }
+
+  /* ── 개념 카드 ── */
+  .concept-card {
+    border: 1.5px solid #CE93D8;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+  .concept-head {
+    background: #6A1B9A;
+    color: #fff;
+    font-size: 9.5pt;
+    font-weight: 700;
+    padding: 8px 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .concept-body {
+    padding: 15px;
+    background: #FAF5FF;
+  }
+
+  /* ── 자기점검 ── */
+  .checklist {
+    border: 1.5px solid #90CAF9;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 30px;
+  }
+  .checklist-head {
+    background: #1565C0;
+    color: #fff;
+    font-weight: 700;
+    font-size: 10pt;
+    padding: 10px 15px;
+  }
+  .checklist-body { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #fff;}
+  @media (max-width: 600px) { .checklist-body { grid-template-columns: 1fr; } }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 9.5pt; cursor: pointer; }
+  .check-item input { width: 16px; height: 16px; accent-color: #1565C0; cursor: pointer; }
+  .check-item .ci-num { color: #1565C0; font-weight: 700; }
+
+  /* 버튼 */
+  .submit-btn {
+    display: block;
+    width: 100%;
+    background: #1565C0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 15px;
+    font-size: 13pt;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background 0.2s, transform 0.1s;
+  }
+  .submit-btn:hover { background: #0D47A1; }
+  .submit-btn:active { transform: translateY(2px); }
+  .submit-btn:disabled { background: #90CAF9; cursor: not-allowed; transform: none; }
+
+  #loadingOverlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,255,255,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #1565C0;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <h2 style="color: #1565C0;">제출 중입니다...</h2>
+  <p>창을 닫지 말고 잠시만 기다려주세요.</p>
+</div>
+
+<div class="container">
+  <form id="activityForm">
+    <!-- 헤더 -->
+    <div class="sheet-header">
+      <div class="header-title-block">
+        <div class="sub">2026학년도 2학기</div>
+        <div class="main">과학독서논술<br>활 동 지</div>
+        <div class="sub" style="margin-top:3px;">과학탐구실험2</div>
+      </div>
+      <div class="header-info">
+        <div class="info-cell"><span class="info-label">학년</span><input type="number" name="grade" min="1" max="3" required oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></div>
+        <div class="info-cell"><span class="info-label">반</span><input type="number" name="classNum" min="1" max="20" required oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></div>
+        <div class="info-cell"><span class="info-label">번호</span><input type="number" name="studentNum" min="1" max="50" required oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></div>
+        <div class="info-cell"><span class="info-label">이름</span><input type="text" name="studentName" required oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></div>
+        <div class="header-note">※ 다른 곳에서 복사하여 붙여넣기를 할 수 없습니다. 직접 타이핑하여 작성하세요.</div>
+      </div>
+    </div>
+
+    <!-- ① 도서 선택 -->
+    <div class="section">
+      <div class="sec-head">
+        <span class="crit-num">채점 ①</span>
+        <span class="sec-title">과학 관련 주제 및 도서 선택</span>
+      </div>
+      <div class="book-row">
+        <span class="bl">책 제목</span>
+        <input type="text" name="bookTitle" required style="grid-column: span 3;" placeholder="책 제목을 입력하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off">
+        <span class="bl">저자</span>
+        <input type="text" name="bookAuthor" required placeholder="저자 입력" oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off">
+        <span class="bl">선택한 과학 주제</span>
+        <input type="text" name="scienceTopic" required style="grid-column: span 3;" placeholder="주제를 입력하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off">
+        <span class="bl">관련 단원</span>
+        <input type="text" name="relatedUnit" required placeholder="예: 3단원 생명시스템" oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- ② 내용 정리 -->
+    <div class="section">
+      <div class="sec-head">
+        <span class="crit-num">채점 ②</span>
+        <span class="sec-title">책의 내용 정리</span>
+        <span class="sec-hint">각 장·주제별 핵심 내용을 요약하여 서술하세요.</span>
+      </div>
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th class="label-cell">장·주제</th>
+            <th class="content-cell">핵심 내용 요약</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="label-cell"><input type="text" name="ch1_title" placeholder="장/주제명" required oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></td>
+            <td class="content-cell"><textarea name="ch1_content" required placeholder="핵심 내용을 요약하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></textarea></td>
+          </tr>
+          <tr>
+            <td class="label-cell"><input type="text" name="ch2_title" placeholder="장/주제명" required oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></td>
+            <td class="content-cell"><textarea name="ch2_content" required placeholder="핵심 내용을 요약하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></textarea></td>
+          </tr>
+          <tr>
+            <td class="label-cell"><input type="text" name="ch3_title" placeholder="장/주제명" oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></td>
+            <td class="content-cell"><textarea name="ch3_content" placeholder="핵심 내용을 요약하세요. (선택)" oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></textarea></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ③ 생각 및 느낌 -->
+    <div class="section">
+      <div class="sec-head">
+        <span class="crit-num">채점 ③</span>
+        <span class="sec-title">책에 대한 나의 생각 및 느낌</span>
+        <span class="sec-hint">단순 감상에 그치지 않고, 과학적 관점에서 인상 깊었던 점과 새롭게 느낀 점을 서술하세요.</span>
+      </div>
+      <textarea name="myThoughts" class="lg lined" required placeholder="책을 통해 달라진 생각, 인상 깊은 내용, 과학에 대해 느낀 점 등을 자유롭게 서술하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></textarea>
+    </div>
+
+    <!-- ④ 핵심 지식·개념·원리 -->
+    <div class="section">
+      <div class="sec-head">
+        <span class="crit-num">채점 ④</span>
+        <span class="sec-title">새롭게 알게 된 핵심 지식 · 개념 · 원리</span>
+        <span class="sec-hint">이 책을 통해 처음 알게 되거나 더 깊이 이해하게 된 과학 지식·개념·원리를 서술하세요.</span>
+      </div>
+      <textarea name="newKnowledge" class="lg lined" required placeholder="예) '케플러 법칙', '유전자 발현 조절', 'CRISPR 원리' 등 책에서 배운 핵심 과학 내용을 구체적으로 정리하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></textarea>
+    </div>
+
+    <!-- ⑤ 심화 주제 선정 -->
+    <div class="section">
+      <div class="sec-head">
+        <span class="crit-num g">채점 ⑤</span>
+        <span class="sec-title">독서 활동을 통한 심화 주제 선정</span>
+        <span class="sec-hint">이 책을 읽고 더 탐구하고 싶어진 과학적 주제를 선정하세요.</span>
+      </div>
+      <div class="topic-box">
+        <div class="topic-label">선정한<br>심화 주제</div>
+        <div class="topic-content">
+          <input type="text" name="deepTopic" required placeholder="심화 주제를 입력하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off" style="border:1px solid #A5D6A7;">
+          <input type="text" name="deepTopicKeyword" required placeholder="관련 분야 / 키워드를 입력하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off" style="border:1px solid #A5D6A7; font-size:9pt;">
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ 주제 선정 동기 -->
+    <div class="section">
+      <div class="sec-head">
+        <span class="crit-num g">채점 ⑥</span>
+        <span class="sec-title">주제 선정 동기 (진로·관심사 등)</span>
+        <span class="sec-hint">왜 이 주제를 선택했는지 진로·관심사·경험 등과 연결하여 구체적으로 서술하세요.</span>
+      </div>
+      <textarea name="topicMotivation" class="md lined" required placeholder="예) 나는 의생명공학에 관심이 있어서 유전자 가위 기술을 심화 주제로 선정하였다. 이 책을 읽으며…" oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off"></textarea>
+    </div>
+
+    <!-- ⑦ 과학적 개념·원리·용어 정확한 설명 -->
+    <div class="section">
+      <div class="sec-head">
+        <span class="crit-num p">채점 ⑦</span>
+        <span class="sec-title">과학적 개념 · 원리 · 용어 정확한 설명</span>
+        <span class="sec-hint">심화 주제와 관련된 핵심 과학 개념·원리·용어 2가지 이상을 골라 정확하게 설명하세요.</span>
+      </div>
+      <div class="concept-card">
+        <div class="concept-head">
+          <span style="white-space:nowrap;">개념·용어 ①</span>
+          <input type="text" name="term1_name" required placeholder="용어 입력" style="flex:1; border:none; background:rgba(255,255,255,0.9); padding:4px 8px; border-radius:4px; font-weight:bold; outline:none;" oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off">
+        </div>
+        <div class="concept-body">
+          <textarea name="term1_desc" class="md" required placeholder="개념 및 용어에 대한 설명을 작성하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off" style="border: 1px solid #CE93D8;"></textarea>
+        </div>
+      </div>
+      <div class="concept-card" style="margin-bottom:0;">
+        <div class="concept-head">
+          <span style="white-space:nowrap;">개념·용어 ②</span>
+          <input type="text" name="term2_name" required placeholder="용어 입력" style="flex:1; border:none; background:rgba(255,255,255,0.9); padding:4px 8px; border-radius:4px; font-weight:bold; outline:none;" oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off">
+        </div>
+        <div class="concept-body">
+          <textarea name="term2_desc" class="md" required placeholder="개념 및 용어에 대한 설명을 작성하세요." oncopy="return false;" onpaste="return false;" oncut="return false;" autocomplete="off" style="border: 1px solid #CE93D8;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 자기점검 체크리스트 -->
+    <div class="checklist">
+      <div class="checklist-head">✅ 제출 전 자기점검 체크리스트</div>
+      <div class="checklist-body">
+        <label class="check-item"><input type="checkbox" required><span class="ci-num">①</span> 과학 관련 주제와 도서를 선택하였다.</label>
+        <label class="check-item"><input type="checkbox" required><span class="ci-num">②</span> 책의 내용을 정리하여 서술하였다.</label>
+        <label class="check-item"><input type="checkbox" required><span class="ci-num">③</span> 책에 대한 생각·느낌을 서술하였다.</label>
+        <label class="check-item"><input type="checkbox" required><span class="ci-num">④</span> 새롭게 알게 된 과학 개념·원리를 서술하였다.</label>
+        <label class="check-item"><input type="checkbox" required><span class="ci-num">⑤</span> 심화 주제를 선정하였다.</label>
+        <label class="check-item"><input type="checkbox" required><span class="ci-num">⑥</span> 주제 선정 동기를 구체적으로 서술하였다.</label>
+        <label class="check-item" style="grid-column:1/-1;"><input type="checkbox" required><span class="ci-num">⑦</span> 과학적 개념·원리·용어를 정확하게 설명하였다.</label>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">활동지 최종 제출하기</button>
+  </form>
+</div>
+
+<script>
+  // ==========================================
+  // [설정] 선생님이 생성한 구글 앱스 스크립트 웹앱 URL을 아래에 입력하세요.
+  // ==========================================
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMa02AFq14iljAVsHU1WIiPe3fDHrtsefB5z-0YzKxugAMRLxDU_qXlwoWVCeGmSX3wQ/exec"; 
+
+  const form = document.getElementById('activityForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+
+  // 우클릭 방지
+  document.addEventListener('contextmenu', event => event.preventDefault());
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault(); // 기본 제출 동작 막기
+
+    if (GOOGLE_SCRIPT_URL === "여기에_웹앱_URL을_붙여넣으세요") {
+      alert("선생님이 아직 시스템을 설정하지 않았습니다. (URL 연동 누락)");
+      return;
+    }
+
+    // 로딩 화면 표시 및 버튼 비활성화
+    loadingOverlay.style.display = 'flex';
+    submitBtn.disabled = true;
+
+    const formData = new FormData(form);
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      loadingOverlay.style.display = 'none';
+      submitBtn.disabled = false;
+      
+      if(data.result === 'success') {
+        alert("제출이 완료되었습니다. 수고하셨습니다!");
+        form.reset(); // 폼 초기화
+      } else {
+        alert("제출 중 오류가 발생했습니다: " + data.message);
+      }
+    })
+    .catch(error => {
+      loadingOverlay.style.display = 'none';
+      submitBtn.disabled = false;
+      console.error('Error!', error.message);
+      alert("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
+    });
+  });
+</script>
+</body>
+</html>
