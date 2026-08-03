@@ -257,9 +257,50 @@
     margin-bottom: 15px;
   }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  /* ── 팝업 ── */
+  #warningPopup {
+    display: flex;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+  }
+  .popup-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .popup-content h3 { color: #d32f2f; margin-bottom: 15px; font-size: 14pt; }
+  .popup-content p { font-size: 11pt; margin-bottom: 25px; line-height: 1.5; color: #333; }
+  .popup-btn {
+    background: #1565C0;
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 4px;
+    font-size: 11pt;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .popup-btn:hover { background: #0D47A1; }
 </style>
 </head>
 <body>
+
+<div id="warningPopup">
+  <div class="popup-content">
+    <h3>🚨 주의사항</h3>
+    <p>이 활동지 폼에서는 <strong>복사 및 붙여넣기</strong>가 금지되어 있습니다.<br>반드시 스스로 생각하며 직접 타이핑해 주세요.</p>
+    <button class="popup-btn" onclick="document.getElementById('warningPopup').style.display='none'">확인했습니다</button>
+  </div>
+</div>
 
 <div id="loadingOverlay">
   <div class="spinner"></div>
@@ -437,6 +478,11 @@
 
   // 우클릭 방지
   document.addEventListener('contextmenu', event => event.preventDefault());
+
+  // 붙여넣기 시도 시 경고
+  document.addEventListener('paste', function(e) {
+    alert("⚠️ 복사 및 붙여넣기는 금지되어 있습니다. 직접 타이핑해 주세요!");
+  });
 
   form.addEventListener('submit', function(e) {
     e.preventDefault(); // 기본 제출 동작 막기
