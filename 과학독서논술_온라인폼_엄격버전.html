@@ -482,7 +482,9 @@
 
   // 붙여넣기 시도 시 경고
   document.addEventListener('paste', function(e) {
+    isAlerting = true; // 알림창으로 인한 포커스 상실 시 내용 삭제 방지
     alert("⚠️ 복사 및 붙여넣기는 금지되어 있습니다. 직접 타이핑해 주세요!");
+    setTimeout(() => { isAlerting = false; }, 200);
   });
 
   // ── [화면 이탈 방지 엄격 모드 로직] ──
