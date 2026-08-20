@@ -298,7 +298,7 @@
   <div class="popup-content">
     <h3>🚨 주의사항 (경고 누적 모드)</h3>
     <p>이 활동지 폼에서는 <strong>복사 및 붙여넣기</strong>가 금지되어 있습니다.</p>
-    <p style="color: #d32f2f; font-weight: bold; background: #ffebee; padding: 10px; border-radius: 5px;">작성 도중 다른 창이나 탭으로 화면을 이동하면 경고가 누적됩니다.<br><b>첫 번째 이탈은 경고</b>로 끝나지만,<br><b>두 번째 이탈 시 작성 중인 모든 내용이 즉시 삭제(초기화)</b>됩니다!<br>제출 완료 전까지 화면을 벗어나지 마세요.</p>
+    <p style="color: #d32f2f; font-weight: bold; background: #ffebee; padding: 10px; border-radius: 5px;">작성 도중 다른 창이나 탭으로 화면을 이동하면 경고가 누적됩니다.<br><b>첫 번째 이탈은 경고</b>로 끝나지만, <b>두 번째 이탈 시 즉시 내용이 삭제</b>됩니다!<br>또한, 첫 이탈이라도 <b>5초 이상 화면을 벗어나면 즉시 삭제</b>됩니다.<br>제출 완료 전까지 화면을 벗어나지 마세요.</p>
     <button class="popup-btn" onclick="document.getElementById('warningPopup').style.display='none'">확인했습니다</button>
   </div>
 </div>
@@ -487,40 +487,71 @@
     setTimeout(() => { isAlerting = false; }, 200);
   });
 
-  // ── [화면 이탈 방지 경고 누적 모드 로직] ──
+  // ── [화면 이탈 방지 완벽 하이브리드 모드 로직] ──
   let isAlerting = false; // 무한 알림창 방지용 플래그
   let leaveCount = 0; // 이탈 횟수 카운터
+  let awayTimer = null; // 5초 체류 측정 타이머
+  let isDeleted = false; // 5초 경과로 삭제되었는지 여부
 
-  function handleCheatAttempt() {
-    // 팝업창이 떠있는 상태나 로딩 중일 때는 감지 예외 처리
+  function handleLeave() {
     if (loadingOverlay.style.display === 'flex' || document.getElementById('warningPopup').style.display !== 'none' || isAlerting) {
       return; 
     }
     
-    isAlerting = true;
-    leaveCount++;
+    // 이미 이탈 타이머가 돌고 있다면 무시
+    if (awayTimer !== null) return;
     
-    setTimeout(() => {
-      if (leaveCount === 1) {
-        // 1차 경고 (내용 유지)
-        alert("🚨 [경고 1회] 화면 이탈이 감지되었습니다!\n\n이번 한 번은 실수로 간주하여 작성 내용을 유지하지만, 다음 번 화면 이탈 시에는 작성 중인 모든 내용이 즉시 삭제됩니다.");
-      } else {
-        // 2차 이상 이탈 (내용 삭제)
-        form.reset();
-        alert("🚨 [경고 2회 누적] 화면을 반복해서 벗어나는 행위가 감지되었습니다!\n\n부정행위 방지를 위해 지금까지 작성한 모든 내용이 완전히 삭제(초기화)되었습니다. 처음부터 다시 작성해 주세요.");
-      }
-      // 알림창 닫은 후 플래그 해제
-      setTimeout(() => { isAlerting = false; }, 200);
-    }, 100);
+    // 이탈 시작 시 타이머 설정 (5초 뒤 백그라운드에서 조용히 자동 삭제)
+    awayTimer = setTimeout(() => {
+      form.reset();
+      isDeleted = true; // 삭제되었음을 표시 (알림은 학생이 돌아왔을 때 띄움)
+    }, 5000);
   }
 
-  // 브라우저 창이 포커스를 잃었을 때 (다른 프로그램 클릭 등)
-  window.addEventListener('blur', handleCheatAttempt);
+  function handleReturn() {
+    if (awayTimer !== null) {
+      clearTimeout(awayTimer);
+      awayTimer = null;
+      
+      if (isDeleted) {
+        // 5초가 지나서 이미 삭제된 경우
+        isAlerting = true;
+        setTimeout(() => {
+          alert("🚨 [경고] 5초 이상 화면을 이탈하여 작성 중인 내용이 모두 삭제(초기화)되었습니다.\n\n처음부터 다시 작성해 주세요.");
+          isDeleted = false;
+          setTimeout(() => { isAlerting = false; }, 200);
+        }, 100);
+      } else {
+        // 5초 이내에 돌아온 경우 (실수 구제, 하지만 카운트 증가)
+        leaveCount++;
+        isAlerting = true;
+        
+        setTimeout(() => {
+          if (leaveCount === 1) {
+            // 1차 경고 (내용 유지)
+            alert("🚨 [경고 1회] 화면 이탈이 감지되었습니다!\n\n5초 이내에 복귀하여 이번 한 번은 내용을 유지하지만, 다음 번 화면 이탈 시에는 즉시 삭제됩니다.");
+          } else {
+            // 2차 이상 이탈 (내용 삭제)
+            form.reset();
+            alert("🚨 [경고 2회 누적] 화면을 반복해서 벗어나는 행위가 감지되었습니다!\n\n부정행위 방지를 위해 지금까지 작성한 모든 내용이 완전히 삭제(초기화)되었습니다.");
+          }
+          setTimeout(() => { isAlerting = false; }, 200);
+        }, 100);
+      }
+    }
+  }
+
+  // 브라우저 창이 포커스를 잃었을 때
+  window.addEventListener('blur', handleLeave);
+  // 다시 창으로 복귀했을 때
+  window.addEventListener('focus', handleReturn);
   
   // 브라우저 탭을 전환하거나 최소화했을 때
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'hidden') {
-      handleCheatAttempt();
+      handleLeave();
+    } else {
+      handleReturn();
     }
   });
   // ──────────────────────────────
